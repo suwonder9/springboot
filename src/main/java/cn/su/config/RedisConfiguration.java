@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.connection.RedisNode;
 import org.springframework.data.redis.connection.RedisSentinelConfiguration;
 import org.springframework.data.redis.connection.jedis.JedisConnectionFactory;
 import org.springframework.data.redis.core.script.DefaultRedisScript;
@@ -26,14 +27,16 @@ public class RedisConfiguration {
 
 
     @Bean
-    public RedisConnectionFactory createRedisConnectionFactory(){
+    public RedisConnectionFactory createRedisConnectionFactory() {
 
         RedisSentinelConfiguration sentinelConfig = new RedisSentinelConfiguration();
 
         sentinelConfig.master(masterName);
 
-       return new JedisConnectionFactory(sentinelConfig);
+        String[] hostPort = host.split(":");
+        sentinelConfig.addSentinel(new RedisNode(hostPort[0], Integer.valueOf(hostPort[1])));
 
+        return new JedisConnectionFactory(sentinelConfig);
     }
 
     @Bean(name="su")
